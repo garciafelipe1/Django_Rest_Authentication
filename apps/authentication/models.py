@@ -63,6 +63,16 @@ class  UserAccount(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     
+    two_factor_enabled = models.BooleanField(default=False)
+    otpauth_url= models.CharField(max_length=255,null=True,blank=True)  
+    otp_base32 = models.CharField(max_length=255,null=True)
+    qr_code = models.ImageField(upload_to='qrcode/', null=True, blank=True)
+    login_otp = models.CharField(max_length=255, null=True, blank=True)
+    login_otp_used= models.BooleanField(default=False)
+    otp_created_at = models.DateTimeField(null=True, blank=True)
+    
+    login_ip=models.CharField(max_length=255, null=True, blank=True)
+    
     objects = UserAccountManager()
     
     USERNAME_FIELD = 'email'
@@ -70,6 +80,8 @@ class  UserAccount(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.email
- 
- 
- 
+    
+    def get_qr_code(self):
+        if self.qr_code and hasattr(self.qr_code, 'url'):
+            return self.qr_code.url
+        return None

@@ -253,3 +253,7 @@ if not DEBUG:
     EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
     EMAIL_USE_TLS = env("EMAIL_USE_TLS")== "True"
     DEFAULT_FROM_EMAIL = "Zephira <no-reply@Zephira.finance>"
+    
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

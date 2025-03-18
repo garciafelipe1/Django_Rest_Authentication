@@ -5,6 +5,9 @@ django-environ==0.9.0
 django-ckeditor==6.3.2
 djangorestframework-api-response==0.1.0
 
+pyotp==2.9.0
+qrcode==8.0
+
 pillow==11.0.0
 
 uvicorn==0.32.0
