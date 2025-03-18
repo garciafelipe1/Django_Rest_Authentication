@@ -6,6 +6,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('api/authentication', include('apps.authentication.urls')),
+    path('api/profile/', include('apps.user_profile.urls')),
     path("auth/", include("djoser.urls")),
     path("auth/", include("djoser.urls.jwt")),
     # path("auth/", include("djoser.social.jwt")),

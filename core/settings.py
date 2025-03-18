@@ -31,18 +31,34 @@ DJANGO_APPS = [
 ]
 
 PROJECT_APPS = [
-    'apps.authentication'
+    'apps.authentication',
+    'apps.user_profile',
 ]
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework_api',
     'channels',
     'djoser',
     "rest_framework_simplejwt",
-    "rest_framework_simplejwt.token_blacklist"
+    "rest_framework_simplejwt.token_blacklist",
+    'ckeditor',
+    'ckeditor_uploader',
+    
 ]
 
+
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'autoParagraph': False
+    },
+}
+
+CKEDITOR_UPLOAD_PATH = "media/"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

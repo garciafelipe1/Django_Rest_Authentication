@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
     BaseUserManager
 )
 
-from djoser.signals import user_registered, user_activated
+
 
 class UserAccountManager(BaseUserManager):
 
@@ -70,13 +70,6 @@ class  UserAccount(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.email
-    
-def post_user_registered(user,*args,**kwargs):
-    print("user registered")
-    
-def post_user_activated(user, *args, **kwargs):
-    print("user has registered")
-    
-user_registered.connect(post_user_registered)
-user_activated.connect(post_user_activated)
-        
+ 
+ 
+ 
