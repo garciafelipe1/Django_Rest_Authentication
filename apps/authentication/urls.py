@@ -5,7 +5,8 @@ from .views import(
     VerifyOTPView,
     Set2FAView,
     DisableOTPView,
-    OTPLoginResetView
+    OTPLoginResetView,
+    OTPLoginView
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path("set_2fa/", Set2FAView.as_view(), name="set-2fa-view"),
     path("disable_otp/", DisableOTPView.as_view(), name="disable-otp-view"),
     path("otp_login_reset/", OTPLoginResetView.as_view(), name="reset-otp-view"),
+    path("opt_login/", OTPLoginView.as_view(), name="opt-login-view"),
 ]   

@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     'ckeditor',
     'ckeditor_uploader',
+    'axes'
     
 ]
 
@@ -60,6 +61,10 @@ CKEDITOR_CONFIGS = {
 
 CKEDITOR_UPLOAD_PATH = "media/"
 
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = lambda request: timedelta(minutes=1)
+AXES_LOCK_OUT_AT_FAILURE = True
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -69,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -169,6 +175,8 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
+    'axes.backends.AxesStandaloneBackend',
+    
     'django.contrib.auth.backends.ModelBackend',
 )
 

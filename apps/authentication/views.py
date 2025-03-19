@@ -10,7 +10,8 @@ from django.utils.crypto import get_random_string
 User=get_user_model()
 from utils.client_ip import get_client_ip
 from django.utils import timezone
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
 
 
 
@@ -55,7 +56,7 @@ class OTPLoginResetView(StandardAPIView):
             
         user.login_ip=new_ip
         
-        if user.qrcode is None or user.otp_base32 is None:
+        if user.qr_code is None or user.otp_base32 is None:
             return self.response("QR Code or OTP Base32 not found for user")
         
         try: 
@@ -77,7 +78,7 @@ class VerifyOTPView(StandardAPIView):
         user = request.user
         
         
-        if user.qrcode is None or user.otp_base32 is None:
+        if user.qr_code is None or user.otp_base32 is None:
             return self.response("QR Code or OTP Base32 not found for user")
         
         totp=pyotp.TOTP(user.otp_base32)
@@ -97,7 +98,7 @@ class DisableOTPView(StandardAPIView):
     def post(self, request):
         user = request.user
         
-        if user.qrcode is None or user.otp_base32 is None:
+        if user.qr_code is None or user.otp_base32 is None:
             return self.response("QR Code or OTP Base32 not found for user")
         
         totp=pyotp.TOTP(user.otp_base32)
@@ -110,7 +111,7 @@ class DisableOTPView(StandardAPIView):
             user.otp_base32=None
             user.qr_code=None
             user.login_otp=None
-            user.login_otp_used=None
+            user.login_otp_used=False
             user.otp_created_at=None
             user.save()
             return self.response("Two Factor Authentication Disabled")
@@ -124,7 +125,7 @@ class Set2FAView(StandardAPIView):  # Define una vista llamada Set2FAView, hered
     def post(self, request, *args, **kwargs):  # Define el método POST para manejar las solicitudes POST
         user = request.user  # Obtiene el usuario autenticado de la solicitud
 
-        if user.qrcode is None:  # Verifica si el usuario tiene un código QR configurado
+        if user.qr_code is None:  # Verifica si el usuario tiene un código QR configurado
             return self.error("QR Code not found for user")  # Si no, devuelve un error (asumiendo self.error existe)
 
         boolean = bool(request.data.get("bool"))  # Obtiene el valor 'bool' del cuerpo de la solicitud y lo convierte a booleano
@@ -137,4 +138,31 @@ class Set2FAView(StandardAPIView):  # Define una vista llamada Set2FAView, hered
             user.two_factor_auth_enabled = False  # Deshabilita la autenticación de dos factores para el usuario
             user.save()  # Guarda los cambios en el usuario
             return self.response("2FA DEACTIVATED")  # Devuelve una respuesta de éxito (asumiendo self.response existe)
+
+class OTPLoginView(StandardAPIView):
+    permissions_classes = [permissions.IsAuthenticated]
     
+    def post(self, request):
+        email=request.data.get("email")
+        otp_code=request.data.get("otp")
+        
+        
+        if not email or not otp_code:
+            return self.error("Both username and OTP code are required")
+        
+        try:
+            user=User.objects.get(email=email)
+            totp=pyotp.TOTP(user.otp_base32)
+            if not totp.verify(otp_code):
+                return self.error("Invalid OTP code")
+        
+            user.login_otp_used=True
+            user.save()
+            
+            refresh=RefreshToken.for_user(user)
+            return self.response({
+                "access":str(refresh.access_token),
+                "refresh":str(refresh),
+            })
+        except User.DoesNotExist:
+            return self.error("User does not exist",status=status.HTTP_404_NOT_FOUND)
